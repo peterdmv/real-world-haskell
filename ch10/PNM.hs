@@ -4,15 +4,15 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 import qualified Data.ByteString.Lazy as L
 import Data.Char (isSpace)
 
-data GreyMap = GreyMap {
+data Greymap = Greymap {
     greyWidth :: Int
   , greyHeight :: Int
   , greyMax :: Int
   , greyData :: L.ByteString
   } deriving (Eq)
 
-instance Show GreyMap where
-  show (GreyMap w h m _) = "GreyMap " ++ show w ++ "x" ++ show h ++
+instance Show Greymap where
+  show (Greymap w h m _) = "Greymap " ++ show w ++ "x" ++ show h ++
                            " " ++ show m
 
 matchHeader :: L.ByteString -> L.ByteString -> Maybe L.ByteString
@@ -43,10 +43,10 @@ Nothing >>? _ = Nothing
 Just v >>? f  = f v
 
 -- Take a ByteString and if the parse succeeds, it will return a single parsed
--- GreyMap, along with the string that remains after parsing. That residual
+-- Greymap, along with the string that remains after parsing. That residual
 -- string will be available for future parses.
 --
-parseP5 :: L.ByteString -> Maybe (GreyMap, L.ByteString)
+parseP5 :: L.ByteString -> Maybe (Greymap, L.ByteString)
 parseP5 s =
   case matchHeader (L8.pack "P5") s of
     Nothing -> Nothing
@@ -68,10 +68,10 @@ parseP5 s =
                           case getBytes (width * height) s5 of
                             Nothing -> Nothing
                             Just (bitmap, s6) ->
-                              Just (GreyMap width height maxGrey bitmap, s6)
+                              Just (Greymap width height maxGrey bitmap, s6)
 
 
-parseP5_take2 :: L.ByteString -> Maybe (GreyMap, L.ByteString)
+parseP5_take2 :: L.ByteString -> Maybe (Greymap, L.ByteString)
 parseP5_take2 s =
   matchHeader (L8.pack "P5") s      >>?
   \s -> skipSpace((), s)            >>?
@@ -82,7 +82,7 @@ parseP5_take2 s =
   \(height, s) -> getNat s          >>?
   \(maxGrey, s) -> getBytes 1 s     >>?
   (getBytes (width * height) . snd) >>?
-  \(bitmap, s) -> Just (GreyMap width height maxGrey bitmap, s)
+  \(bitmap, s) -> Just (Greymap width height maxGrey bitmap, s)
 
 skipSpace :: (a, L.ByteString) -> Maybe (a, L.ByteString)
 skipSpace (a, s) = Just (a, L8.dropWhile isSpace s)

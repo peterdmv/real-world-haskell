@@ -5,7 +5,7 @@ import Data.Int (Int64)
 import Data.Word (Word8)
 import qualified Data.ByteString.Lazy as L
 import qualified Data.ByteString.Lazy.Char8 as L8
-import PNM (GreyMap(..))
+import PNM (Greymap(..))
 
 data ParseState = ParseState {
     string :: L.ByteString
@@ -127,7 +127,7 @@ parseRawPGM =
     parseNat ==> \maxGrey ->
     parseByte ==>&
     parseBytes (width * height) ==> \bitmap ->
-    identity (GreyMap width height maxGrey bitmap)
+    identity (Greymap width height maxGrey bitmap)
   where notWhite = (`notElem` " \r\n\t")
 
 parseWhileWith :: (Word8 -> a) -> (a -> Bool) -> Parse [a]
