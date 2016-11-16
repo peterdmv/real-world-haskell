@@ -279,10 +279,16 @@ updateMap :: Parity Digit   -- ^ new digit
           -> ParityMap
 updateMap digit key seq = insertMap key (fromParity digit) (digit:seq)
 
-insertMap :: Digit -> Digit -> [a] -> Map a -> Map a
+insertMap :: Digit  -- ^ existing key
+          -> Digit  -- ^ new digit
+          -> [a]    -- ^ new sequence
+          -> Map a  -- ^ map to update
+          -> Map a
 insertMap key digit val m = val `seq` M.insert key' val m
     where key' = (key + digit) `mod` 10
 
+-- This algorithm throws away potential matches when two sequences have
+-- the same checkDigit.
 useDigit :: ParityMap -> ParityMap -> Parity Digit -> ParityMap
 useDigit old new digit =
     new `M.union` M.foldrWithKey (updateMap digit) M.empty old
@@ -313,8 +319,10 @@ updateFirst key seq = insertMap key digit (digit:renormalize qes)
         digit = firstDigit qes
         qes = reverse seq
 
+-- Throws away potential solutions if two sequences have the same checkdigit.
+-- See function insertMap.
 buildMap :: [[Parity Digit]] -> DigitMap
-buildMap = M.mapKeys (10 -)
+buildMap = M.mapKeys ((`mod` 10) . (10 -))
          . addFirstDigit
          . finalDigits
 
