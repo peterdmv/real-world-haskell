@@ -1,5 +1,7 @@
 module Parse where
 
+import Control.Applicative (Applicative(..))
+import Control.Monad (liftM, ap)
 import Data.Char (chr, isDigit, isSpace)
 import Data.Int (Int64)
 import Data.Word (Word8)
@@ -161,3 +163,13 @@ parseBytes n =
     in putState st' ==>&
        assert (L.length h == n') "end of input" ==>&
        identity h
+
+ -- Chapter 14: Monads
+instance Applicative Parse where
+    pure = identity
+    (<*>) = ap
+
+instance Monad Parse where
+    return = identity
+    (>>=) = (==>)
+    fail = bail
